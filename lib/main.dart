@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 
 import 'main_navigation.dart';
 import 'providers/drone_provider.dart';
+import 'providers/weather_provider.dart';
 
 void main() {
   runApp(const VarunaAI());
@@ -13,12 +14,17 @@ class VarunaAI extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (_) {
-        final provider = DroneProvider();
-        provider.start();
-        return provider;
-      },
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(
+          create: (_) {
+            final provider = DroneProvider();
+            provider.start();
+            return provider;
+          },
+        ),
+        ChangeNotifierProvider(create: (_) => WeatherProvider()),
+      ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
         title: "VARUNA AI",
@@ -27,11 +33,11 @@ class VarunaAI extends StatelessWidget {
           useMaterial3: true,
           scaffoldBackgroundColor: const Color(0xFFF5F7FB),
           colorSchemeSeed: Colors.blue,
-          appBarTheme: AppBarTheme(
+          appBarTheme: const AppBarTheme(
             backgroundColor: Colors.white,
             elevation: 0,
-            iconTheme: const IconThemeData(color: Colors.black87),
-            titleTextStyle: const TextStyle(
+            iconTheme: IconThemeData(color: Colors.black87),
+            titleTextStyle: TextStyle(
               color: Colors.black87,
               fontSize: 18,
               fontWeight: FontWeight.w600,
