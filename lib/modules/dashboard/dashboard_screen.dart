@@ -5,13 +5,13 @@ import '../../widgets/dashboard/preflight_checklist_card.dart';
 import '../../widgets/dashboard/navigation_card.dart';
 
 class DashboardScreen extends StatelessWidget {
-  const DashboardScreen({super.key});
+  final Function(int)? onNavigate;
+
+  const DashboardScreen({super.key, this.onNavigate});
 
   @override
   Widget build(BuildContext context) {
     final isMobile = MediaQuery.of(context).size.width < 768;
-    final mainNavState =
-        context.findAncestorStateOfType<_MainNavigationState>();
 
     return Scaffold(
       body: Container(
@@ -19,7 +19,7 @@ class DashboardScreen extends StatelessWidget {
           image: DecorationImage(
             image: const AssetImage('assets/images/dashboard_bg.png'),
             fit: BoxFit.cover,
-            opacity: 0.08,
+            opacity: 0.1,
           ),
           color: const Color(0xFFF5F7FB),
         ),
@@ -29,14 +29,9 @@ class DashboardScreen extends StatelessWidget {
             Expanded(
               child: SingleChildScrollView(
                 padding: const EdgeInsets.all(24),
-                child: Column(
-                  children: [
-                    if (isMobile)
-                      _buildMobileLayout(context, mainNavState)
-                    else
-                      _buildDesktopLayout(context, mainNavState),
-                  ],
-                ),
+                child: isMobile
+                    ? _buildMobileLayout(context)
+                    : _buildDesktopLayout(context),
               ),
             ),
           ],
@@ -45,14 +40,10 @@ class DashboardScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildDesktopLayout(
-    BuildContext context,
-    _MainNavigationState? mainNavState,
-  ) {
+  Widget _buildDesktopLayout(BuildContext context) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Left Column
         Expanded(
           flex: 1,
           child: Column(
@@ -64,7 +55,6 @@ class DashboardScreen extends StatelessWidget {
           ),
         ),
         const SizedBox(width: 24),
-        // Right Column
         Expanded(
           flex: 1,
           child: Column(
@@ -74,9 +64,7 @@ class DashboardScreen extends StatelessWidget {
                 subtitle: 'Plan & Execute Missions',
                 icon: Icons.flight_takeoff,
                 color: Colors.blue,
-                onTap: () {
-                  mainNavState?._onNavigate(1);
-                },
+                onTap: () => onNavigate?.call(1),
               ),
               const SizedBox(height: 24),
               NavigationCard(
@@ -84,9 +72,7 @@ class DashboardScreen extends StatelessWidget {
                 subtitle: 'View Mission Reports',
                 icon: Icons.assessment,
                 color: Colors.orange,
-                onTap: () {
-                  mainNavState?._onNavigate(2);
-                },
+                onTap: () => onNavigate?.call(2),
               ),
               const SizedBox(height: 24),
               NavigationCard(
@@ -94,9 +80,7 @@ class DashboardScreen extends StatelessWidget {
                 subtitle: 'System Configuration',
                 icon: Icons.settings,
                 color: Colors.purple,
-                onTap: () {
-                  mainNavState?._onNavigate(3);
-                },
+                onTap: () => onNavigate?.call(3),
               ),
             ],
           ),
@@ -105,10 +89,7 @@ class DashboardScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildMobileLayout(
-    BuildContext context,
-    _MainNavigationState? mainNavState,
-  ) {
+  Widget _buildMobileLayout(BuildContext context) {
     return Column(
       children: [
         const SystemStatusCard(),
@@ -120,9 +101,7 @@ class DashboardScreen extends StatelessWidget {
           subtitle: 'Plan & Execute Missions',
           icon: Icons.flight_takeoff,
           color: Colors.blue,
-          onTap: () {
-            mainNavState?._onNavigate(1);
-          },
+          onTap: () => onNavigate?.call(1),
         ),
         const SizedBox(height: 16),
         NavigationCard(
@@ -130,9 +109,7 @@ class DashboardScreen extends StatelessWidget {
           subtitle: 'View Mission Reports',
           icon: Icons.assessment,
           color: Colors.orange,
-          onTap: () {
-            mainNavState?._onNavigate(2);
-          },
+          onTap: () => onNavigate?.call(2),
         ),
         const SizedBox(height: 16),
         NavigationCard(
@@ -140,65 +117,9 @@ class DashboardScreen extends StatelessWidget {
           subtitle: 'System Configuration',
           icon: Icons.settings,
           color: Colors.purple,
-          onTap: () {
-            mainNavState?._onNavigate(3);
-          },
+          onTap: () => onNavigate?.call(3),
         ),
       ],
     );
   }
-}
-
-// Extension to access main navigation state
-class _MainNavigationState extends State<MainNavigation> {
-  int _selectedIndex = 0;
-
-  final List<Widget> _pages = const [
-    DashboardScreen(),
-    MissionScreen(),
-    ReportsScreen(),
-    SettingsScreen(),
-  ];
-
-  void _onNavigate(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: _pages[_selectedIndex],
-    );
-  }
-}
-
-// Placeholder screens
-class MainNavigation extends StatefulWidget {
-  const MainNavigation({super.key});
-
-  @override
-  State<MainNavigation> createState() => _MainNavigationState();
-}
-
-class MissionScreen extends StatelessWidget {
-  const MissionScreen({super.key});
-
-  @override
-  Widget build(BuildContext context) => const SizedBox();
-}
-
-class ReportsScreen extends StatelessWidget {
-  const ReportsScreen({super.key});
-
-  @override
-  Widget build(BuildContext context) => const SizedBox();
-}
-
-class SettingsScreen extends StatelessWidget {
-  const SettingsScreen({super.key});
-
-  @override
-  Widget build(BuildContext context) => const SizedBox();
 }
