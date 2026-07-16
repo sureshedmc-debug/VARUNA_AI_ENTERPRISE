@@ -24,7 +24,7 @@ class DashboardScreen extends StatelessWidget {
         ),
         child: Column(
           children: [
-            _buildPremiumHeader(),
+            _buildPremiumHeader(context),
             Expanded(
               child: SingleChildScrollView(
                 padding: EdgeInsets.all(isSmallMobile ? 16 : 24),
@@ -39,7 +39,7 @@ class DashboardScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildPremiumHeader() {
+  Widget _buildPremiumHeader(BuildContext context) {
     final now = DateTime.now();
     final dateFormatter = DateFormat('EEE, MMM d');
     final timeFormatter = DateFormat('HH:mm');
@@ -681,7 +681,7 @@ class DashboardScreen extends StatelessWidget {
                 ),
               ),
             ),
-          );
+          ),
         );
       },
     );
