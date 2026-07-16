@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
 import '../../widgets/dashboard/technology_background.dart';
 import '../../widgets/dashboard/glassmorphic_card.dart';
+import '../../widgets/dashboard/weather_panel.dart';
 
 class DashboardScreen extends StatelessWidget {
   final Function(int)? onNavigate;
@@ -229,6 +230,8 @@ class DashboardScreen extends StatelessWidget {
               _buildSystemStatusCard(),
               const SizedBox(height: 24),
               _buildPreflightChecklistCard(),
+              const SizedBox(height: 24),
+              const WeatherPanel(),
             ],
           ),
         ),
@@ -273,6 +276,8 @@ class DashboardScreen extends StatelessWidget {
         _buildSystemStatusCard(),
         const SizedBox(height: 20),
         _buildPreflightChecklistCard(),
+        const SizedBox(height: 20),
+        const WeatherPanel(),
         const SizedBox(height: 20),
         _buildNavigationCard(
           title: 'Mission',
