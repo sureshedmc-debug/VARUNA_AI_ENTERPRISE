@@ -22,7 +22,7 @@ class _MainNavigationState extends State<MainNavigation> {
     super.initState();
     _pages = [
       DashboardScreen(onNavigate: _onNavigate),
-      const MissionScreen(),
+      MissionScreen(onBack: () => _onNavigate(0)),
       const ReportsScreen(),
       const SettingsScreen(),
     ];
