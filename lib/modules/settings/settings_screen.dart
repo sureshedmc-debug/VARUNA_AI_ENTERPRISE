@@ -1,48 +1,242 @@
 import 'package:flutter/material.dart';
+import '../../widgets/dashboard/glassmorphic_card.dart';
 
-class SettingsScreen extends StatelessWidget {
-  const SettingsScreen({super.key});
+class SettingsScreen extends StatefulWidget {
+  final VoidCallback? onBack;
+
+  const SettingsScreen({super.key, this.onBack});
+
+  @override
+  State<SettingsScreen> createState() => _SettingsScreenState();
+}
+
+class _SettingsScreenState extends State<SettingsScreen> {
+  bool notificationsEnabled = true;
+  bool autoStartMissions = false;
+  String selectedTheme = 'Light';
+  String selectedLanguage = 'English';
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Settings'),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: widget.onBack ?? () => Navigator.of(context).pop(),
+        ),
+        title: const Text(
+          'Settings',
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
+        elevation: 0,
+        backgroundColor: Colors.white,
+        foregroundColor: Colors.black87,
       ),
-      body: ListView(
-        children: const [
-          ListTile(
-            leading: Icon(Icons.memory),
-            title: Text('Raspberry Pi'),
-            subtitle: Text('Not Connected'),
-          ),
-          Divider(),
-          ListTile(
-            leading: Icon(Icons.flight),
-            title: Text('Pixhawk'),
-            subtitle: Text('Not Connected'),
-          ),
-          Divider(),
-          ListTile(
-            leading: Icon(Icons.psychology),
-            title: Text('TensorFlow Model'),
-            subtitle: Text('Not Loaded'),
-          ),
-          Divider(),
-          ListTile(
-            leading: Icon(Icons.palette),
-            title: Text('Theme'),
-            subtitle: Text('System Default'),
-          ),
-          Divider(),
-          ListTile(
-            leading: Icon(Icons.info_outline),
-            title: Text('VARUNA AI Enterprise'),
-            subtitle: Text('Version 1.0'),
-          ),
-        ],
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            GlassmorphicCard(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'System Preferences',
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black87,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  _buildSwitchTile(
+                    'Notifications',
+                    'Receive mission and system alerts',
+                    notificationsEnabled,
+                    (value) => setState(() => notificationsEnabled = value),
+                  ),
+                  const SizedBox(height: 12),
+                  _buildSwitchTile(
+                    'Auto-Start Missions',
+                    'Automatically start scheduled missions',
+                    autoStartMissions,
+                    (value) => setState(() => autoStartMissions = value),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 24),
+            GlassmorphicCard(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'Display Settings',
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black87,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  _buildDropdownTile(
+                    'Theme',
+                    selectedTheme,
+                    ['Light', 'Dark', 'Auto'],
+                    (value) => setState(() => selectedTheme = value ?? 'Light'),
+                  ),
+                  const SizedBox(height: 12),
+                  _buildDropdownTile(
+                    'Language',
+                    selectedLanguage,
+                    ['English', 'Spanish', 'French', 'German'],
+                    (value) => setState(() => selectedLanguage = value ?? 'English'),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 24),
+            GlassmorphicCard(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'Device Management',
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black87,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  _buildDetailRow('Raspberry Pi', 'Connected'),
+                  const SizedBox(height: 12),
+                  _buildDetailRow('Pixhawk', 'Connected'),
+                  const SizedBox(height: 12),
+                  _buildDetailRow('GPS Module', 'Active'),
+                  const SizedBox(height: 12),
+                  _buildDetailRow('Camera', 'Ready'),
+                ],
+              ),
+            ),
+            const SizedBox(height: 24),
+            GlassmorphicCard(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'About',
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black87,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  _buildDetailRow('App Version', '1.0.0'),
+                  const SizedBox(height: 12),
+                  _buildDetailRow('Build Number', '001'),
+                  const SizedBox(height: 12),
+                  _buildDetailRow('Last Updated', 'Jul 16, 2026'),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
-}
 
+  Widget _buildSwitchTile(
+    String title,
+    String subtitle,
+    bool value,
+    Function(bool) onChanged,
+  ) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                title,
+                style: const TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.black87,
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                subtitle,
+                style: TextStyle(
+                  fontSize: 12,
+                  color: Colors.grey.shade600,
+                ),
+              ),
+            ],
+          ),
+        ),
+        Switch(
+          value: value,
+          onChanged: onChanged,
+        ),
+      ],
+    );
+  }
+
+  Widget _buildDropdownTile(
+    String label,
+    String value,
+    List<String> options,
+    Function(String?) onChanged,
+  ) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(
+          label,
+          style: const TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.w600,
+            color: Colors.black87,
+          ),
+        ),
+        DropdownButton<String>(
+          value: value,
+          items: options
+              .map((e) => DropdownMenuItem(value: e, child: Text(e)))
+              .toList(),
+          onChanged: onChanged,
+        ),
+      ],
+    );
+  }
+
+  Widget _buildDetailRow(String label, String value) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(
+          label,
+          style: TextStyle(
+            fontSize: 14,
+            color: Colors.grey.shade700,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+        Text(
+          value,
+          style: const TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.w600,
+            color: Colors.black87,
+          ),
+        ),
+      ],
+    );
+  }
+}
