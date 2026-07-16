@@ -12,15 +12,23 @@ class ReportsScreen extends StatelessWidget {
       appBar: AppBar(
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
-          onPressed: onBack ?? () => Navigator.of(context).pop(),
+          onPressed: () => _navigateBack(context),
+          tooltip: 'Back to Dashboard',
         ),
         title: const Text(
-          'Mission Reports',
-          style: TextStyle(fontWeight: FontWeight.bold),
+          'Reports',
+          style: TextStyle(fontWeight: FontWeight.bold, letterSpacing: 0.5),
         ),
         elevation: 0,
         backgroundColor: Colors.white,
         foregroundColor: Colors.black87,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.home),
+            onPressed: () => _navigateToDashboard(context),
+            tooltip: 'Dashboard',
+          ),
+        ],
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(24),
@@ -88,6 +96,18 @@ class ReportsScreen extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  void _navigateBack(BuildContext context) {
+    if (Navigator.of(context).canPop()) {
+      Navigator.of(context).pop();
+    } else {
+      _navigateToDashboard(context);
+    }
+  }
+
+  void _navigateToDashboard(BuildContext context) {
+    Navigator.of(context).pushNamedAndRemoveUntil('/dashboard', (route) => false);
   }
 
   Widget _buildSummaryMetric(String label, String value, Color color) {
