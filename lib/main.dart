@@ -23,10 +23,20 @@ class VarunaAI extends StatelessWidget {
         debugShowCheckedModeBanner: false,
         title: "VARUNA AI",
         theme: ThemeData(
-          brightness: Brightness.dark,
+          brightness: Brightness.light,
           useMaterial3: true,
-          scaffoldBackgroundColor: const Color(0xFF061B34),
-          colorSchemeSeed: Colors.cyan,
+          scaffoldBackgroundColor: const Color(0xFFF5F7FB),
+          colorSchemeSeed: Colors.blue,
+          appBarTheme: AppBarTheme(
+            backgroundColor: Colors.white,
+            elevation: 0,
+            iconTheme: const IconThemeData(color: Colors.black87),
+            titleTextStyle: const TextStyle(
+              color: Colors.black87,
+              fontSize: 18,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
         ),
         home: const MainNavigation(),
       ),
