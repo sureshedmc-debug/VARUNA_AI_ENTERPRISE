@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
@@ -699,8 +701,8 @@ class _TechnologyBackgroundPainter extends CustomPainter {
     final path = Path();
     for (int i = 0; i < 6; i++) {
       final angle = (i * 60 - 90) * 3.14159 / 180;
-      final x = center.dx + size * 0.5 * (angle.cos());
-      final y = center.dy + size * 0.5 * (angle.sin());
+      final x = center.dx + size * 0.5 * math.cos(angle);
+      final y = center.dy + size * 0.5 * math.sin(angle);
       if (i == 0) {
         path.moveTo(x, y);
       } else {
