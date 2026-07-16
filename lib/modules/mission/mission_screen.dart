@@ -12,15 +12,23 @@ class MissionScreen extends StatelessWidget {
       appBar: AppBar(
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
-          onPressed: onBack ?? () => Navigator.of(context).pop(),
+          onPressed: () => _navigateBack(context),
+          tooltip: 'Back to Dashboard',
         ),
         title: const Text(
-          'Mission Management',
-          style: TextStyle(fontWeight: FontWeight.bold),
+          'Mission Control',
+          style: TextStyle(fontWeight: FontWeight.bold, letterSpacing: 0.5),
         ),
         elevation: 0,
         backgroundColor: Colors.white,
         foregroundColor: Colors.black87,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.home),
+            onPressed: () => _navigateToDashboard(context),
+            tooltip: 'Dashboard',
+          ),
+        ],
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(24),
@@ -89,6 +97,18 @@ class MissionScreen extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  void _navigateBack(BuildContext context) {
+    if (Navigator.of(context).canPop()) {
+      Navigator.of(context).pop();
+    } else {
+      _navigateToDashboard(context);
+    }
+  }
+
+  void _navigateToDashboard(BuildContext context) {
+    Navigator.of(context).pushNamedAndRemoveUntil('/dashboard', (route) => false);
   }
 
   Widget _buildMissionTile(
