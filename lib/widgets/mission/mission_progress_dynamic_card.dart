@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-class MissionProgressCard extends StatelessWidget {
+class MissionProgressDynamicCard extends StatelessWidget {
   final int completedWaypoints;
   final int totalWaypoints;
   final String missionStatus;

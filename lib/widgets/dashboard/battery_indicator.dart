@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
-import '../../services/telemetry/telemetry_service.dart';
+import 'package:provider/provider.dart';
+
+import '../../providers/drone_provider.dart';
 
 class BatteryIndicator extends StatelessWidget {
   const BatteryIndicator({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return AnimatedBuilder(
-      animation: TelemetryService.instance,
-      builder: (context, _) {
-        final battery = TelemetryService.instance.battery;
+    return Consumer<DroneProvider>(
+      builder: (context, drone, _) {
+        final battery = drone.battery;
 
         Color color = Colors.green;
         if (battery < 30) {
@@ -33,7 +34,7 @@ class BatteryIndicator extends StatelessWidget {
               Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.battery_full,color: color,size: 32),
+                  Icon(Icons.battery_full, color: color, size: 32),
                   Text(
                     '${battery.toStringAsFixed(0)}%',
                     style: const TextStyle(
@@ -51,4 +52,5 @@ class BatteryIndicator extends StatelessWidget {
     );
   }
 }
+
 

@@ -1,53 +1,22 @@
-import 'dart:async';
-
-import 'package:geolocator/geolocator.dart';
-
 import '../models/drone_model.dart';
-import 'location_service.dart';
+import 'network/websocket_service.dart';
 
+/// Thin adapter that exposes the [WebSocketService] stream to [DroneProvider].
+///
+/// All real connectivity and reconnection logic lives in [WebSocketService].
 class DroneService {
-  final LocationService _locationService = LocationService();
+  DroneService();
 
-  final StreamController<DroneModel> _controller =
-      StreamController<DroneModel>.broadcast();
+  /// Live stream of [DroneModel] snapshots received from the backend.
+  Stream<DroneModel> get droneStream => WebSocketService.instance.stream;
 
-  Stream<DroneModel> get droneStream => _controller.stream;
-
-  StreamSubscription<Position>? _positionSubscription;
-
-  double _battery = 100;
-
+  /// Start the WebSocket connection to the Raspberry Pi backend.
   void start() {
-    _positionSubscription =
-        _locationService.getLiveLocation().listen((position) {
-      _battery -= 0.02;
-
-      if (_battery <= 0) {
-        _battery = 100;
-      }
-
-      final drone = DroneModel(
-        connected: true,
-        battery: _battery,
-        satellites: 18,
-        altitude: position.altitude,
-        speed: position.speed,
-        heading: position.heading,
-        latitude: position.latitude,
-        longitude: position.longitude,
-        mode: "LOITER",
-      );
-
-      _controller.add(drone);
-    });
+    WebSocketService.instance.start();
   }
 
+  /// Stop the WebSocket connection permanently.
   void stop() {
-    _positionSubscription?.cancel();
-  }
-
-  void dispose() {
-    _positionSubscription?.cancel();
-    _controller.close();
+    WebSocketService.instance.stop();
   }
 }
