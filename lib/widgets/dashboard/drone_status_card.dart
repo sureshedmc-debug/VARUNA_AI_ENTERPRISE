@@ -85,27 +85,3 @@ class DroneStatusCard extends StatelessWidget {
     );
   }
 }
-
-
-  Widget _tile(String title, String value) {
-    return SizedBox(
-      width: 150,
-      child: Card(
-        elevation: 0,
-        child: Padding(
-          padding: const EdgeInsets.all(12),
-          child: Column(
-            children: [
-              Text(value,
-                  style: const TextStyle(
-                      fontWeight: FontWeight.bold, fontSize: 18)),
-              const SizedBox(height: 4),
-              Text(title),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-

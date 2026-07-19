@@ -8,7 +8,7 @@ class MissionProgressDynamicCard extends StatelessWidget {
   final double remainingDistance;
   final double areaSurveyed;
 
-  const MissionProgressCard({
+  const MissionProgressDynamicCard({
     super.key,
     required this.completedWaypoints,
     required this.totalWaypoints,

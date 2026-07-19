@@ -14,6 +14,7 @@ class TelemetryBinding {
   void reset() {
     TelemetryController.instance.reset();
     DashboardController.instance.refresh();
+    AIController.instance.refreshAdvice();
   }
 }
 
