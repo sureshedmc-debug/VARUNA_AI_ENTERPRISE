@@ -1,17 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
-import '../../services/telemetry/telemetry_service.dart';
+import '../../providers/drone_provider.dart';
 
 class LiveMapWidget extends StatelessWidget {
   const LiveMapWidget({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return AnimatedBuilder(
-      animation: TelemetryService.instance,
-      builder: (context, _) {
-        final telemetry = TelemetryService.instance;
-
+    return Consumer<DroneProvider>(
+      builder: (context, drone, _) {
         return Card(
           child: Column(
             children: [
@@ -30,17 +28,17 @@ class LiveMapWidget extends StatelessWidget {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Icon(Icons.map,size:64),
-                    const SizedBox(height:16),
+                    const Icon(Icons.map, size: 64),
+                    const SizedBox(height: 16),
                     Text(
-                      'Lat : ${telemetry.latitude.toStringAsFixed(6)}',
+                      'Lat : ${drone.latitude.toStringAsFixed(6)}',
                     ),
                     Text(
-                      'Lng : ${telemetry.longitude.toStringAsFixed(6)}',
+                      'Lng : ${drone.longitude.toStringAsFixed(6)}',
                     ),
-                    const SizedBox(height:16),
+                    const SizedBox(height: 16),
                     const Text(
-                      'Google Maps / Flutter Map integration\nwill render here.',
+                      'Flutter Map integration\nwill render here.',
                       textAlign: TextAlign.center,
                     ),
                   ],
@@ -65,4 +63,5 @@ class LiveMapWidget extends StatelessWidget {
     );
   }
 }
+
 

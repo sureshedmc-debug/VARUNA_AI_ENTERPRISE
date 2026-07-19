@@ -11,19 +11,8 @@ class AppInitializer {
     LoggerService.instance.info('Initializing VARUNA AI...');
 
     if (!kIsWeb) {
-  await DatabaseService.instance.initialize();
-}
-
-    LoggerService.instance.info('Database initialized');
-    LoggerService.instance.info('Theme initialized');
-
-    // Initialize remaining services here:
-    // ConnectionManager
-    // TelemetryService
-    // RaspberryPiService
-    // PixhawkService
-    // VideoStreamService
-    // TensorflowService
+      await DatabaseService.instance.initialize();
+    }
 
     LoggerService.instance.info('Application Ready');
   }

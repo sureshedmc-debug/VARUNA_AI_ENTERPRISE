@@ -159,13 +159,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
   void _navigateBack(BuildContext context) {
     if (Navigator.of(context).canPop()) {
       Navigator.of(context).pop();
-    } else {
-      _navigateToDashboard(context);
+    } else if (widget.onBack != null) {
+      widget.onBack!();
     }
   }
 
   void _navigateToDashboard(BuildContext context) {
-    Navigator.of(context).pushNamedAndRemoveUntil('/dashboard', (route) => false);
+    if (widget.onBack != null) {
+      widget.onBack!();
+    } else if (Navigator.of(context).canPop()) {
+      Navigator.of(context).popUntil((route) => route.isFirst);
+    }
   }
 
   Widget _buildSwitchTile(

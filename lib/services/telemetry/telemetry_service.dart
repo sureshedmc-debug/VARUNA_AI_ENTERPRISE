@@ -14,9 +14,8 @@ class TelemetryService extends ChangeNotifier {
   String flightMode = 'UNKNOWN';
   bool armed = false;
 
-  bool get readyToFly =>
-      battery > 20 && satellites >= 8;
-      bool get gpsReady => satellites >= 8;
+  bool get readyToFly => battery > 20 && satellites >= 8;
+  bool get gpsReady => satellites >= 8;
 
   void update({
     required double latitude,

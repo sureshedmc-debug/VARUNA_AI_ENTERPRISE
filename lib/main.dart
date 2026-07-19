@@ -5,6 +5,7 @@ import 'main_navigation.dart';
 import 'providers/drone_provider.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
   runApp(const VarunaAI());
 }
 

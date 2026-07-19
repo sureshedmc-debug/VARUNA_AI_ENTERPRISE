@@ -2,9 +2,12 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:percent_indicator/circular_percent_indicator.dart';
-import '../../widgets/dashboard/technology_background.dart';
+import 'package:provider/provider.dart';
+
+import '../../providers/drone_provider.dart';
 import '../../widgets/dashboard/glassmorphic_card.dart';
+import '../../widgets/dashboard/system_status_card.dart';
+import '../../widgets/dashboard/preflight_checklist_card.dart';
 
 class DashboardScreen extends StatelessWidget {
   final Function(int)? onNavigate;
@@ -144,34 +147,44 @@ class DashboardScreen extends StatelessWidget {
   List<Widget> _buildHeaderRight() {
     return [
       const SizedBox(width: 32),
-      Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-        decoration: BoxDecoration(
-          color: Colors.green.withOpacity(0.15),
-          border: Border.all(color: Colors.green.withOpacity(0.3)),
-          borderRadius: BorderRadius.circular(8),
-        ),
-        child: Row(
-          children: [
-            Container(
-              width: 8,
-              height: 8,
-              decoration: BoxDecoration(
-                color: Colors.green,
-                shape: BoxShape.circle,
-              ),
+      // Status badge – wraps in Consumer so only this widget rebuilds.
+      Consumer<DroneProvider>(
+        builder: (context, drone, _) {
+          final isOnline = drone.isWsConnected;
+          final statusColor = isOnline ? Colors.green : Colors.red;
+          return Container(
+            padding:
+                const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+            decoration: BoxDecoration(
+              color: statusColor.withOpacity(0.15),
+              border: Border.all(color: statusColor.withOpacity(0.3)),
+              borderRadius: BorderRadius.circular(8),
             ),
-            const SizedBox(width: 6),
-            Text(
-              'System Online',
-              style: TextStyle(
-                fontSize: 11,
-                fontWeight: FontWeight.w600,
-                color: Colors.green.shade700,
-              ),
+            child: Row(
+              children: [
+                Container(
+                  width: 8,
+                  height: 8,
+                  decoration: BoxDecoration(
+                    color: statusColor,
+                    shape: BoxShape.circle,
+                  ),
+                ),
+                const SizedBox(width: 6),
+                Text(
+                  isOnline ? 'System Online' : 'System Offline',
+                  style: TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w600,
+                    color: isOnline
+                        ? Colors.green.shade700
+                        : Colors.red.shade700,
+                  ),
+                ),
+              ],
             ),
-          ],
-        ),
+          );
+        },
       ),
       const SizedBox(width: 24),
       _buildIconButton(Icons.notifications_none, Colors.grey.shade700),
@@ -303,227 +316,11 @@ class DashboardScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildSystemStatusCard() {
-    final items = [
-      ('Raspberry Pi', Icons.memory, true),
-      ('Pixhawk', Icons.flight, false),
-      ('GPS', Icons.location_on, false),
-      ('Camera', Icons.videocam, false),
-      ('AI Engine', Icons.psychology, false),
-      ('Telemetry', Icons.data_usage, true),
-      ('Internet', Icons.cloud, true),
-      ('Battery', Icons.battery_full, false),
-    ];
+  /// Delegates to [SystemStatusCard] which reads live data from [DroneProvider].
+  Widget _buildSystemStatusCard() => const SystemStatusCard();
 
-    return GlassmorphicCard(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            'System Status',
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              color: Colors.black87,
-            ),
-          ),
-          const SizedBox(height: 20),
-          GridView.count(
-            crossAxisCount: 2,
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            crossAxisSpacing: 12,
-            mainAxisSpacing: 12,
-            children: items.map((item) {
-              return _buildStatusTile(item.$2, item.$1, item.$3);
-            }).toList(),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildStatusTile(IconData icon, String title, bool isActive) {
-    return Container(
-      decoration: BoxDecoration(
-        color: (isActive ? Colors.green : Colors.red).withOpacity(0.1),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: (isActive ? Colors.green : Colors.red).withOpacity(0.3),
-          width: 1,
-        ),
-      ),
-      padding: const EdgeInsets.all(12),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            icon,
-            color: isActive ? Colors.green.shade600 : Colors.red.shade600,
-            size: 24,
-          ),
-          const SizedBox(height: 8),
-          Text(
-            title,
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 12,
-              fontWeight: FontWeight.w600,
-              color: isActive ? Colors.green.shade700 : Colors.red.shade700,
-            ),
-          ),
-          const SizedBox(height: 4),
-          Container(
-            width: 6,
-            height: 6,
-            decoration: BoxDecoration(
-              color: isActive ? Colors.green : Colors.red,
-              shape: BoxShape.circle,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildPreflightChecklistCard() {
-    final items = [
-      'Raspberry Pi Connected',
-      'Pixhawk Connected',
-      'GPS Lock',
-      'Camera Ready',
-      'Compass Calibrated',
-      'AI Model Loaded',
-      'Mission Uploaded',
-      'Battery Above 40%',
-    ];
-
-    final completedCount = 1;
-    final progress = completedCount / items.length;
-
-    return GlassmorphicCard(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            'Pre-Flight Checklist',
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              color: Colors.black87,
-            ),
-          ),
-          const SizedBox(height: 20),
-          ...List.generate(
-            items.length,
-            (index) => Padding(
-              padding: EdgeInsets.only(
-                bottom: index < items.length - 1 ? 12 : 0,
-              ),
-              child: _buildChecklistItem(
-                items[index],
-                completedCount > index,
-              ),
-            ),
-          ),
-          const SizedBox(height: 24),
-          Container(
-            decoration: BoxDecoration(
-              color: Colors.blue.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: Colors.blue.withOpacity(0.3), width: 1),
-            ),
-            padding: const EdgeInsets.all(16),
-            child: Row(
-              children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Mission Ready',
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.blue.shade900,
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        '${(progress * 100).toStringAsFixed(0)}% System Ready',
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: Colors.blue.shade700,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                SizedBox(
-                  width: 70,
-                  height: 70,
-                  child: CircularPercentIndicator(
-                    radius: 35,
-                    lineWidth: 5,
-                    percent: progress,
-                    center: Text(
-                      '87%',
-                      style: TextStyle(
-                        fontSize: 13,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.blue.shade600,
-                      ),
-                    ),
-                    progressColor: Colors.blue.shade400,
-                    backgroundColor: Colors.blue.shade100,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildChecklistItem(String title, bool isCompleted) {
-    return Row(
-      children: [
-        AnimatedContainer(
-          duration: const Duration(milliseconds: 300),
-          width: 24,
-          height: 24,
-          decoration: BoxDecoration(
-            color: isCompleted ? Colors.green.shade400 : Colors.grey.shade300,
-            borderRadius: BorderRadius.circular(6),
-          ),
-          child: isCompleted
-              ? const Icon(
-                  Icons.check,
-                  size: 14,
-                  color: Colors.white,
-                )
-              : null,
-        ),
-        const SizedBox(width: 12),
-        Expanded(
-          child: Text(
-            title,
-            style: TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w500,
-              color: isCompleted
-                  ? Colors.green.shade600
-                  : Colors.grey.shade600,
-              decoration: isCompleted
-                  ? TextDecoration.lineThrough
-                  : TextDecoration.none,
-            ),
-          ),
-        ),
-      ],
-    );
-  }
+  /// Delegates to [PreflightChecklistCard] which reads live data from [DroneProvider].
+  Widget _buildPreflightChecklistCard() => const PreflightChecklistCard();
 
   Widget _buildNavigationCard({
     required String title,

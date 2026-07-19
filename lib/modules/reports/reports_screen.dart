@@ -101,13 +101,17 @@ class ReportsScreen extends StatelessWidget {
   void _navigateBack(BuildContext context) {
     if (Navigator.of(context).canPop()) {
       Navigator.of(context).pop();
-    } else {
-      _navigateToDashboard(context);
+    } else if (onBack != null) {
+      onBack!();
     }
   }
 
   void _navigateToDashboard(BuildContext context) {
-    Navigator.of(context).pushNamedAndRemoveUntil('/dashboard', (route) => false);
+    if (onBack != null) {
+      onBack!();
+    } else if (Navigator.of(context).canPop()) {
+      Navigator.of(context).popUntil((route) => route.isFirst);
+    }
   }
 
   Widget _buildSummaryMetric(String label, String value, Color color) {
