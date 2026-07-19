@@ -3,10 +3,11 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 import '../models/drone_model.dart';
+import '../integration/telemetry_binding.dart';
+import '../controllers/telemetry_controller.dart';
 import '../services/drone_service.dart';
 import '../services/network/connection_manager.dart';
 import '../services/network/websocket_service.dart';
-import '../services/telemetry/telemetry_service.dart';
 import '../services/video/video_stream_service.dart';
 
 /// The single source of truth for all drone telemetry.
@@ -21,6 +22,7 @@ class DroneProvider extends ChangeNotifier {
   DroneModel get drone => _drone;
 
   StreamSubscription<DroneModel>? _droneSubscription;
+  bool _started = false;
 
   // ── WebSocket status ───────────────────────────────────────────────────────
 
@@ -59,6 +61,8 @@ class DroneProvider extends ChangeNotifier {
   // ── Lifecycle ──────────────────────────────────────────────────────────────
 
   void start() {
+    if (_started) return;
+    _started = true;
     _service.start();
 
     // Receive live telemetry frames from the backend.
@@ -72,6 +76,8 @@ class DroneProvider extends ChangeNotifier {
   }
 
   void stop() {
+    if (!_started) return;
+    _started = false;
     _droneSubscription?.cancel();
     _droneSubscription = null;
     WebSocketService.instance.removeListener(_onWsStatusChanged);
@@ -82,9 +88,9 @@ class DroneProvider extends ChangeNotifier {
   void _onTelemetry(DroneModel model) {
     _drone = model;
 
-    // Keep the legacy TelemetryService singleton in sync so widgets that
-    // still AnimatedBuilder-listen to it also receive live data.
-    TelemetryService.instance.update(
+    // Keep the legacy telemetry stack in sync so widgets and controllers that
+    // still listen to it also receive live data.
+    TelemetryController.instance.update(
       latitude: model.latitude,
       longitude: model.longitude,
       altitude: model.altitude,
@@ -95,6 +101,7 @@ class DroneProvider extends ChangeNotifier {
       flightMode: model.mode,
       armed: model.armed,
     );
+    TelemetryBinding.instance.onTelemetryUpdated();
 
     // Keep ConnectionManager in sync.
     ConnectionManager.instance
@@ -113,7 +120,7 @@ class DroneProvider extends ChangeNotifier {
     if (!WebSocketService.instance.isConnected) {
       // Mark drone as disconnected so the UI reflects the actual state.
       _drone = DroneModel.initial();
-      TelemetryService.instance.reset();
+      TelemetryBinding.instance.reset();
       ConnectionManager.instance
           .updateRaspberryPi(ConnectionStatus.disconnected);
       ConnectionManager.instance

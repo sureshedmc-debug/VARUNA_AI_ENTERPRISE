@@ -18,6 +18,7 @@ class TelemetryController extends ChangeNotifier {
     required double battery,
     required int satellites,
     required String flightMode,
+    bool armed = false,
   }) {
     telemetry.update(
       latitude: latitude,
@@ -28,6 +29,7 @@ class TelemetryController extends ChangeNotifier {
       battery: battery,
       satellites: satellites,
       flightMode: flightMode,
+      armed: armed,
     );
 
     LoggerService.instance.telemetry(
@@ -42,4 +44,3 @@ class TelemetryController extends ChangeNotifier {
     notifyListeners();
   }
 }
-
